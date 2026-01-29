@@ -1,0 +1,57 @@
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_ollama import ChatOllama
+
+from src.config.settings import settings
+from src.models.state import CRAGState
+
+GRADER_PROMPT = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            """You are a grader assessing relevance of retrieved documents to a user question.
+If the documents contain information relevant to answering the question, grade them as relevant.
+Give a binary score 'yes' or 'no' to indicate whether the documents are relevant.
+Respond with only 'yes' or 'no'.""",
+        ),
+        (
+            "human",
+            """Question: {question}
+
+Documents:
+{documents}
+
+Are these documents relevant to the question? (yes/no)""",
+        ),
+    ]
+)
+
+
+def grade_documents(state: CRAGState) -> CRAGState:
+    question = state["question"]
+    documents = state["documents"]
+
+    if not documents:
+        return {
+            **state,
+            "documents_relevant": False,
+        }
+
+    llm = ChatOllama(
+        model=settings.ollama_model,
+        base_url=settings.ollama_base_url,
+    )
+
+    docs_text = "\n\n".join(
+        [f"Document {i + 1}:\n{doc.page_content}" for i, doc in enumerate(documents)]
+    )
+
+    chain = GRADER_PROMPT | llm
+    response = chain.invoke({"question": question, "documents": docs_text})
+
+    grade = response.content.strip().lower()
+    is_relevant = "yes" in grade
+
+    return {
+        **state,
+        "documents_relevant": is_relevant,
+    }
