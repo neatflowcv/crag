@@ -3,6 +3,7 @@ from langchain_ollama import ChatOllama
 
 from src.config.settings import settings
 from src.models.state import CRAGState
+from src.utils import strip_think_tags
 
 GENERATOR_PROMPT = ChatPromptTemplate.from_messages(
     [
@@ -41,5 +42,5 @@ def generate(state: CRAGState) -> CRAGState:
 
     return {
         **state,
-        "generation": response.content,
+        "generation": strip_think_tags(response.content),
     }

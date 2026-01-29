@@ -3,6 +3,7 @@ from langchain_ollama import ChatOllama
 
 from src.config.settings import settings
 from src.models.state import CRAGState
+from src.utils import strip_think_tags
 
 REWRITER_PROMPT = ChatPromptTemplate.from_messages(
     [
@@ -33,10 +34,10 @@ def rewrite_query(state: CRAGState) -> CRAGState:
     chain = REWRITER_PROMPT | llm
     response = chain.invoke({"question": question})
 
-    rewritten_query = response.content.strip()
+    rewritten_query = strip_think_tags(response.content)
 
     return {
         **state,
-        "question": rewritten_query,
+        "search_query": rewritten_query,
         "retry_count": state.get("retry_count", 0) + 1,
     }

@@ -3,6 +3,7 @@ from langchain_ollama import ChatOllama
 
 from src.config.settings import settings
 from src.models.state import CRAGState
+from src.utils import strip_think_tags
 
 GRADER_PROMPT = ChatPromptTemplate.from_messages(
     [
@@ -48,7 +49,7 @@ def grade_documents(state: CRAGState) -> CRAGState:
     chain = GRADER_PROMPT | llm
     response = chain.invoke({"question": question, "documents": docs_text})
 
-    grade = response.content.strip().lower()
+    grade = strip_think_tags(response.content).lower()
     is_relevant = "yes" in grade
 
     return {

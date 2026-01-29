@@ -1,15 +1,31 @@
 import sys
 from pathlib import Path
 
+import httpx
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from src.config.settings import settings
 from src.graph.builder import build_graph
 from src.models.state import CRAGState
+
+
+def check_ollama() -> bool:
+    try:
+        response = httpx.get(f"{settings.ollama_base_url}/api/tags", timeout=5.0)
+        return response.status_code == 200
+    except httpx.ConnectError:
+        return False
 
 
 def main() -> None:
     if len(sys.argv) < 2:
         print("Usage: uv run python scripts/run_crag.py <question>")
+        sys.exit(1)
+
+    if not check_ollama():
+        print(f"Error: Ollama is not running at {settings.ollama_base_url}")
+        print(f"Please start Ollama and ensure {settings.ollama_model} is available.")
         sys.exit(1)
 
     question = " ".join(sys.argv[1:])
@@ -21,8 +37,9 @@ def main() -> None:
 
     initial_state: CRAGState = {
         "question": question,
+        "search_query": question,
         "documents": [],
-        "web_search_urls": [],
+        "web_search_results": [],
         "generation": "",
         "retry_count": 0,
         "documents_relevant": False,

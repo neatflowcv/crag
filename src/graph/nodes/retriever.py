@@ -3,9 +3,9 @@ from src.vectorstore.store import VectorStore
 
 
 def retrieve(state: CRAGState) -> CRAGState:
-    question = state["question"]
+    search_query = state.get("search_query") or state["question"]
     store = VectorStore()
-    documents = store.search(question)
+    documents = store.search(search_query)
 
     return {
         **state,

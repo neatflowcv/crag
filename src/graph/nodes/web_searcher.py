@@ -3,12 +3,10 @@ from src.web.search import search_web
 
 
 def web_search(state: CRAGState) -> CRAGState:
-    question = state["question"]
-
-    results = search_web(question, max_results=5)
-    urls = [result["href"] for result in results if "href" in result]
+    search_query = state.get("search_query") or state["question"]
+    results = search_web(search_query, max_results=5)
 
     return {
         **state,
-        "web_search_urls": urls,
+        "web_search_results": results,
     }
