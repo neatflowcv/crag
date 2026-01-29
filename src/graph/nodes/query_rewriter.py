@@ -9,15 +9,14 @@ REWRITER_PROMPT = ChatPromptTemplate.from_messages(
     [
         (
             "system",
-            """You are a query rewriter that improves search queries.
-Rewrite the given question to be more specific and suitable for web search.
-Output only the rewritten query, nothing else.""",
+            """You are a query rewriter. Rewrite the question in English as a short search query (2-5 words).
+Output only the query, nothing else.""",
         ),
         (
             "human",
-            """Original question: {question}
+            """Question: {question}
 
-Rewritten query:""",
+English search query:""",
         ),
     ]
 )
