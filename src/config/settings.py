@@ -10,9 +10,15 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    # LLM provider settings
+    llm_provider: str = "ollama"  # "ollama" | "openai"
+
     # Ollama settings
     ollama_base_url: str = "http://localhost:11434"
     ollama_model: str = "qwen3:1.7b"
+
+    # OpenAI settings
+    openai_model: str = "gpt-4o-mini"
 
     # ChromaDB settings
     chroma_persist_dir: Path = Path("data/chroma_db")

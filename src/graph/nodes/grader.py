@@ -1,7 +1,6 @@
+from langchain_core.language_models import BaseChatModel
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_ollama import ChatOllama
 
-from src.config.settings import settings
 from src.models.state import CRAGState
 from src.utils import strip_think_tags
 
@@ -27,7 +26,7 @@ Are these documents relevant to the question? (yes/no)""",
 )
 
 
-def grade_documents(state: CRAGState) -> CRAGState:
+def grade_documents(state: CRAGState, llm: BaseChatModel) -> CRAGState:
     question = state["question"]
     documents = state["documents"]
 
@@ -36,11 +35,6 @@ def grade_documents(state: CRAGState) -> CRAGState:
             **state,
             "documents_relevant": False,
         }
-
-    llm = ChatOllama(
-        model=settings.ollama_model,
-        base_url=settings.ollama_base_url,
-    )
 
     docs_text = "\n\n".join(
         [f"Document {i + 1}:\n{doc.page_content}" for i, doc in enumerate(documents)]

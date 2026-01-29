@@ -1,7 +1,6 @@
+from langchain_core.language_models import BaseChatModel
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_ollama import ChatOllama
 
-from src.config.settings import settings
 from src.models.state import CRAGState
 from src.utils import strip_think_tags
 
@@ -26,14 +25,9 @@ Answer:""",
 )
 
 
-def generate(state: CRAGState) -> CRAGState:
+def generate(state: CRAGState, llm: BaseChatModel) -> CRAGState:
     question = state["question"]
     documents = state["documents"]
-
-    llm = ChatOllama(
-        model=settings.ollama_model,
-        base_url=settings.ollama_base_url,
-    )
 
     context = "\n\n".join([doc.page_content for doc in documents])
 

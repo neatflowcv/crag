@@ -1,7 +1,6 @@
+from langchain_core.language_models import BaseChatModel
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_ollama import ChatOllama
 
-from src.config.settings import settings
 from src.models.state import CRAGState
 from src.utils import strip_think_tags
 
@@ -22,13 +21,8 @@ English search query:""",
 )
 
 
-def rewrite_query(state: CRAGState) -> CRAGState:
+def rewrite_query(state: CRAGState, llm: BaseChatModel) -> CRAGState:
     question = state["question"]
-
-    llm = ChatOllama(
-        model=settings.ollama_model,
-        base_url=settings.ollama_base_url,
-    )
 
     chain = REWRITER_PROMPT | llm
     response = chain.invoke({"question": question})

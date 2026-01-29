@@ -1,5 +1,6 @@
 from typing import Literal
 
+from langchain_core.language_models import BaseChatModel
 from langgraph.graph import END, StateGraph
 
 from src.config.settings import settings
@@ -23,13 +24,13 @@ def should_continue(state: CRAGState) -> Literal["generate", "rewrite_query"]:
     return "rewrite_query"
 
 
-def build_graph() -> StateGraph:
+def build_graph(llm: BaseChatModel) -> StateGraph:
     workflow = StateGraph(CRAGState)
 
     workflow.add_node("retrieve", retrieve)
-    workflow.add_node("grade_documents", grade_documents)
-    workflow.add_node("generate", generate)
-    workflow.add_node("rewrite_query", rewrite_query)
+    workflow.add_node("grade_documents", lambda s: grade_documents(s, llm))
+    workflow.add_node("generate", lambda s: generate(s, llm))
+    workflow.add_node("rewrite_query", lambda s: rewrite_query(s, llm))
     workflow.add_node("web_search", web_search)
     workflow.add_node("fetch_html", fetch_html)
 

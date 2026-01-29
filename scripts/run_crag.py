@@ -2,6 +2,7 @@ import sys
 from pathlib import Path
 
 import httpx
+from langchain_core.language_models import BaseChatModel
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -18,12 +19,26 @@ def check_ollama() -> bool:
         return False
 
 
+def get_llm() -> BaseChatModel:
+    if settings.llm_provider == "openai":
+        from langchain_openai import ChatOpenAI
+
+        return ChatOpenAI(model=settings.openai_model)
+
+    from langchain_ollama import ChatOllama
+
+    return ChatOllama(
+        model=settings.ollama_model,
+        base_url=settings.ollama_base_url,
+    )
+
+
 def main() -> None:
     if len(sys.argv) < 2:
         print("Usage: uv run python scripts/run_crag.py <question>")
         sys.exit(1)
 
-    if not check_ollama():
+    if settings.llm_provider == "ollama" and not check_ollama():
         print(f"Error: Ollama is not running at {settings.ollama_base_url}")
         print(f"Please start Ollama and ensure {settings.ollama_model} is available.")
         sys.exit(1)
@@ -33,7 +48,8 @@ def main() -> None:
     print(f"Question: {question}")
     print("-" * 50)
 
-    graph = build_graph()
+    llm = get_llm()
+    graph = build_graph(llm)
 
     initial_state: CRAGState = {
         "question": question,
