@@ -20,6 +20,7 @@ class Settings(BaseSettings):
 
     # Embedding model
     embedding_model: str = "intfloat/multilingual-e5-small"
+    embedding_model_local_dir: Path = Path("models/multilingual-e5-small")
 
     # RAG settings
     retriever_k: int = 4
