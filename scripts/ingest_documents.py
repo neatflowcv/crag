@@ -22,7 +22,7 @@ def load_documents_from_directory(directory: Path) -> list[Document]:
 
 
 def main() -> None:
-    documents_dir = Path("data/documents")
+    documents_dir = Path("docs")
 
     if not documents_dir.exists():
         print(f"Documents directory not found: {documents_dir}")
