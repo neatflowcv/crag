@@ -52,7 +52,7 @@ def build_graph(
     workflow.add_node("generate", lambda s: generate(s, llm))
     workflow.add_node("rewrite_query", lambda s: rewrite_query(s, llm))
     workflow.add_node("web_search", lambda s: web_search(s, strategy))
-    workflow.add_node("fetch_html", lambda s: fetch_html(s, store))
+    workflow.add_node("fetch_html", lambda s: fetch_html(s, store, llm))
 
     workflow.set_entry_point("translate_query")
 
