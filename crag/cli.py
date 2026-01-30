@@ -1,10 +1,11 @@
 import logging
+import os
 from pathlib import Path
 
 import typer
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=os.getenv("LOG_LEVEL", "INFO").upper(),
     format="%(message)s",
 )
 
