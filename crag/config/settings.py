@@ -32,5 +32,8 @@ class Settings(BaseSettings):
     retriever_k: int = 4
     max_retries: int = 2
 
+    # Web search settings
+    local_search_url: str = "http://127.0.0.1:5000"
+
 
 settings = Settings()

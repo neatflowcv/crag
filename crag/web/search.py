@@ -3,6 +3,8 @@ from dataclasses import dataclass
 
 import httpx
 
+from crag.config.settings import settings
+
 
 @dataclass
 class SearchResult:
@@ -84,10 +86,10 @@ class DuckDuckGoTextSearchStrategy(WebSearchStrategy):
 
 
 class LocalSearchStrategy(WebSearchStrategy):
-    """로컬 검색 서버 (http://127.0.0.1:5000)."""
+    """로컬 검색 서버."""
 
-    def __init__(self, base_url: str = "http://127.0.0.1:5000") -> None:
-        self._base_url = base_url
+    def __init__(self, base_url: str | None = None) -> None:
+        self._base_url = base_url or settings.local_search_url
 
     def search(self, query: str, max_results: int = 5) -> list[SearchResult]:
         try:
