@@ -90,6 +90,7 @@ def run(
     initial_state = {
         "question": question,
         "search_query": question,
+        "web_search_queries": [],
         "documents": [],
         "web_search_results": [],
         "generation": "",
