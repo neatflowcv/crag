@@ -1,8 +1,12 @@
+import logging
+
 import chromadb
 from langchain_core.documents import Document
 
 from crag.config.settings import settings
 from crag.vectorstore.embeddings import get_embedding_model
+
+logger = logging.getLogger(__name__)
 
 
 class VectorStore:
@@ -38,6 +42,18 @@ class VectorStore:
             query_embeddings=query_embedding,
             n_results=k,
         )
+
+        logger.debug("\n[DB Query Results]")
+        logger.debug("  Query: %s", query)
+        logger.debug("  k: %d", k)
+        if results["documents"]:
+            for i, doc_text in enumerate(results["documents"][0]):
+                metadata = results["metadatas"][0][i] if results["metadatas"] else {}
+                distance = results["distances"][0][i] if results.get("distances") else None
+                logger.debug("  --- Document %d ---", i + 1)
+                logger.debug("    Distance: %s", distance)
+                logger.debug("    Source: %s", metadata.get("source", "N/A"))
+                logger.debug("    Content:\n%s", doc_text)
 
         documents = []
         if results["documents"]:
