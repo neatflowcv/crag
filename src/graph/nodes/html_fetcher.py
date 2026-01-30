@@ -4,7 +4,7 @@ from src.models.state import CRAGState
 from src.vectorstore.store import VectorStore
 
 
-def fetch_html(state: CRAGState) -> CRAGState:
+def fetch_html(state: CRAGState, store: VectorStore) -> CRAGState:
     web_results = state.get("web_search_results", [])
     documents = list(state.get("documents", []))
 
@@ -20,11 +20,9 @@ def fetch_html(state: CRAGState) -> CRAGState:
             )
             documents.append(doc)
 
-    if documents:
-        store = VectorStore()
-        new_docs = [doc for doc in documents if doc.metadata.get("source", "").startswith("http")]
-        if new_docs:
-            store.add_documents(new_docs)
+    new_docs = [doc for doc in documents if doc.metadata.get("source", "").startswith("http")]
+    if new_docs:
+        store.add_documents(new_docs)
 
     return {
         **state,

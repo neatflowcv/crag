@@ -81,8 +81,11 @@ def run(
     typer.echo(f"Question: {question}")
     typer.echo("-" * 50)
 
+    from src.vectorstore.store import VectorStore
+
     llm = get_llm()
-    graph = build_graph(llm)
+    store = VectorStore()
+    graph = build_graph(llm, store)
 
     result = graph.invoke({
         "question": question,

@@ -11,6 +11,7 @@ from src.graph.nodes.query_rewriter import rewrite_query
 from src.graph.nodes.retriever import retrieve
 from src.graph.nodes.web_searcher import web_search
 from src.models.state import CRAGState
+from src.vectorstore.store import VectorStore
 
 
 def should_continue(state: CRAGState) -> Literal["generate", "rewrite_query"]:
@@ -24,15 +25,15 @@ def should_continue(state: CRAGState) -> Literal["generate", "rewrite_query"]:
     return "rewrite_query"
 
 
-def build_graph(llm: BaseChatModel) -> StateGraph:
+def build_graph(llm: BaseChatModel, store: VectorStore) -> StateGraph:
     workflow = StateGraph(CRAGState)
 
-    workflow.add_node("retrieve", retrieve)
+    workflow.add_node("retrieve", lambda s: retrieve(s, store))
     workflow.add_node("grade_documents", lambda s: grade_documents(s, llm))
     workflow.add_node("generate", lambda s: generate(s, llm))
     workflow.add_node("rewrite_query", lambda s: rewrite_query(s, llm))
     workflow.add_node("web_search", web_search)
-    workflow.add_node("fetch_html", fetch_html)
+    workflow.add_node("fetch_html", lambda s: fetch_html(s, store))
 
     workflow.set_entry_point("retrieve")
 
