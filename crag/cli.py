@@ -87,7 +87,7 @@ def run(
     store = VectorStore()
     graph = build_graph(llm, store)
 
-    result = graph.invoke({
+    initial_state = {
         "question": question,
         "search_query": question,
         "documents": [],
@@ -95,9 +95,45 @@ def run(
         "generation": "",
         "retry_count": 0,
         "documents_relevant": False,
-    })
+        "needs_web_search": False,
+        "web_search_reason": "",
+    }
 
-    typer.echo(f"\nAnswer:\n{result['generation']}")
+    result = None
+    shown_decision = False
+
+    for event in graph.stream(initial_state):
+        for node_name, node_output in event.items():
+            result = node_output
+
+            if node_name == "retrieve":
+                doc_count = len(node_output.get("documents", []))
+                typer.echo(f"\n[Retrieve] {doc_count}개 문서 검색됨")
+
+            elif node_name == "grade_documents":
+                is_relevant = node_output.get("documents_relevant", False)
+                status = "관련 있음" if is_relevant else "관련 없음"
+                typer.echo(f"[Grade] 문서 관련성: {status}")
+
+            elif node_name == "decide_web_search" and not shown_decision:
+                needs_search = node_output.get("needs_web_search", False)
+                reason = node_output.get("web_search_reason", "")
+                decision = "필요함" if needs_search else "불필요"
+                typer.echo("\n[Web Search Decision]")
+                typer.echo(f"  - 판단: 웹 서치 {decision}")
+                typer.echo(f"  - 이유: {reason}")
+                if needs_search:
+                    typer.echo("\n  -> 웹 서치 진행...")
+                else:
+                    typer.echo("\n  -> 로컬 문서로 답변 생성...")
+                shown_decision = True
+
+            elif node_name == "web_search":
+                search_count = len(node_output.get("web_search_results", []))
+                typer.echo(f"[Web Search] {search_count}개 결과 수집됨")
+
+    typer.echo(f"\n{'=' * 50}")
+    typer.echo(f"Answer:\n{result['generation']}")
 
     if result.get("retry_count", 0) > 0:
         typer.echo(f"\n(Web search was triggered, retries: {result['retry_count']})")

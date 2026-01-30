@@ -11,3 +11,5 @@ class CRAGState(TypedDict):
     generation: str
     retry_count: int
     documents_relevant: bool
+    needs_web_search: bool
+    web_search_reason: str
