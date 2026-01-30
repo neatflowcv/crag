@@ -47,6 +47,14 @@ class VectorStore:
 
         return documents
 
+    def exists_by_source(self, source: str) -> bool:
+        """URL(source)로 이미 저장된 문서가 있는지 확인."""
+        results = self._collection.get(
+            where={"source": source},
+            limit=1,
+        )
+        return bool(results["ids"])
+
     def clear(self) -> None:
         self._client.delete_collection(settings.chroma_collection_name)
         self._collection = self._client.get_or_create_collection(

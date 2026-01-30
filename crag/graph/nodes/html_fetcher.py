@@ -20,7 +20,12 @@ def fetch_html(state: CRAGState, store: VectorStore) -> CRAGState:
             )
             documents.append(doc)
 
-    new_docs = [doc for doc in documents if doc.metadata.get("source", "").startswith("http")]
+    new_docs = [
+        doc
+        for doc in documents
+        if doc.metadata.get("source", "").startswith("http")
+        and not store.exists_by_source(doc.metadata["source"])
+    ]
     if new_docs:
         store.add_documents(new_docs)
 

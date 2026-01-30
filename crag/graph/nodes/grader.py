@@ -10,6 +10,8 @@ GRADER_PROMPT = ChatPromptTemplate.from_messages(
             "system",
             """You are a grader assessing relevance of retrieved documents to a user question.
 If the documents contain information relevant to answering the question, grade them as relevant.
+IMPORTANT: The question and documents may be in different languages (e.g., Korean question with English documents).
+Assess semantic relevance regardless of language differences.
 Give a binary score 'yes' or 'no' to indicate whether the documents are relevant.
 Respond with only 'yes' or 'no'.""",
         ),

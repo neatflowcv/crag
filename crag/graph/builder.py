@@ -8,6 +8,7 @@ from crag.graph.nodes.generator import generate
 from crag.graph.nodes.grader import grade_documents
 from crag.graph.nodes.html_fetcher import fetch_html
 from crag.graph.nodes.query_rewriter import rewrite_query
+from crag.graph.nodes.query_translator import translate_query
 from crag.graph.nodes.retriever import retrieve
 from crag.graph.nodes.web_search_decision import decide_web_search
 from crag.graph.nodes.web_searcher import web_search
@@ -38,6 +39,7 @@ def after_web_search_decision(
 def build_graph(llm: BaseChatModel, store: VectorStore) -> StateGraph:
     workflow = StateGraph(CRAGState)
 
+    workflow.add_node("translate_query", lambda s: translate_query(s, llm))
     workflow.add_node("retrieve", lambda s: retrieve(s, store))
     workflow.add_node("grade_documents", lambda s: grade_documents(s, llm))
     workflow.add_node("decide_web_search", lambda s: decide_web_search(s, llm))
@@ -46,8 +48,9 @@ def build_graph(llm: BaseChatModel, store: VectorStore) -> StateGraph:
     workflow.add_node("web_search", web_search)
     workflow.add_node("fetch_html", lambda s: fetch_html(s, store))
 
-    workflow.set_entry_point("retrieve")
+    workflow.set_entry_point("translate_query")
 
+    workflow.add_edge("translate_query", "retrieve")
     workflow.add_edge("retrieve", "grade_documents")
     workflow.add_conditional_edges(
         "grade_documents",
