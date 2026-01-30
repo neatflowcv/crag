@@ -14,6 +14,7 @@ from crag.graph.nodes.web_search_decision import decide_web_search
 from crag.graph.nodes.web_searcher import web_search
 from crag.models.state import CRAGState
 from crag.vectorstore.store import VectorStore
+from crag.web.search import LocalSearchStrategy, WebSearchStrategy
 
 
 def after_grade(state: CRAGState) -> Literal["generate", "decide_web_search"]:
@@ -36,7 +37,12 @@ def after_web_search_decision(
     return "generate"
 
 
-def build_graph(llm: BaseChatModel, store: VectorStore) -> StateGraph:
+def build_graph(
+    llm: BaseChatModel,
+    store: VectorStore,
+    search_strategy: WebSearchStrategy | None = None,
+) -> StateGraph:
+    strategy = search_strategy or LocalSearchStrategy()
     workflow = StateGraph(CRAGState)
 
     workflow.add_node("translate_query", lambda s: translate_query(s, llm))
@@ -45,7 +51,7 @@ def build_graph(llm: BaseChatModel, store: VectorStore) -> StateGraph:
     workflow.add_node("decide_web_search", lambda s: decide_web_search(s, llm))
     workflow.add_node("generate", lambda s: generate(s, llm))
     workflow.add_node("rewrite_query", lambda s: rewrite_query(s, llm))
-    workflow.add_node("web_search", web_search)
+    workflow.add_node("web_search", lambda s: web_search(s, strategy))
     workflow.add_node("fetch_html", lambda s: fetch_html(s, store))
 
     workflow.set_entry_point("translate_query")
