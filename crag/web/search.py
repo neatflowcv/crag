@@ -24,12 +24,16 @@ class DuckDuckGoInstantAnswerStrategy(WebSearchStrategy):
     """DuckDuckGo Instant Answer API (위키피디아 기반)."""
 
     def search(self, query: str, max_results: int = 5) -> list[SearchResult]:
-        response = httpx.get(
-            "https://api.duckduckgo.com/",
-            params={"q": query, "format": "json", "no_html": "1"},
-            timeout=10.0,
-        )
-        data = response.json()
+        try:
+            response = httpx.get(
+                "https://api.duckduckgo.com/",
+                params={"q": query, "format": "json", "no_html": "1"},
+                timeout=10.0,
+            )
+            response.raise_for_status()
+            data = response.json()
+        except (httpx.RequestError, httpx.HTTPStatusError):
+            return []
 
         results: list[SearchResult] = []
 
@@ -61,10 +65,13 @@ class DuckDuckGoTextSearchStrategy(WebSearchStrategy):
     """DuckDuckGo Text Search (duckduckgo-search 패키지)."""
 
     def search(self, query: str, max_results: int = 5) -> list[SearchResult]:
-        from duckduckgo_search import DDGS
+        try:
+            from duckduckgo_search import DDGS
 
-        with DDGS() as ddgs:
-            raw_results = list(ddgs.text(query, max_results=max_results))
+            with DDGS() as ddgs:
+                raw_results = list(ddgs.text(query, max_results=max_results))
+        except Exception:
+            return []
 
         return [
             SearchResult(
@@ -83,12 +90,16 @@ class LocalSearchStrategy(WebSearchStrategy):
         self._base_url = base_url
 
     def search(self, query: str, max_results: int = 5) -> list[SearchResult]:
-        response = httpx.get(
-            f"{self._base_url}/search",
-            params={"q": query, "format": "json"},
-            timeout=30.0,
-        )
-        data = response.json()
+        try:
+            response = httpx.get(
+                f"{self._base_url}/search",
+                params={"q": query, "format": "json"},
+                timeout=30.0,
+            )
+            response.raise_for_status()
+            data = response.json()
+        except (httpx.RequestError, httpx.HTTPStatusError):
+            return []
 
         results: list[SearchResult] = []
         for item in data.get("results", [])[:max_results]:
