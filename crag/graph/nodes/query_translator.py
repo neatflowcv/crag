@@ -30,6 +30,8 @@ def translate_query(state: CRAGState, llm: BaseChatModel) -> CRAGState:
 
     translated_query = strip_think_tags(response.content)
 
+    print(f"[Translate] {question} -> {translated_query}")
+
     return {
         **state,
         "search_query": translated_query,
