@@ -6,6 +6,7 @@ from langchain_core.documents import Document
 class CRAGState(TypedDict):
     question: str
     search_query: str
+    web_search_queries: list[str]
     documents: list[Document]
     web_search_results: list[dict]
     generation: str

@@ -8,14 +8,19 @@ REWRITER_PROMPT = ChatPromptTemplate.from_messages(
     [
         (
             "system",
-            """You are a query rewriter. Rewrite the question in English as a short search query (2-5 words).
-Output only the query, nothing else.""",
+            """You are a web search query generator.
+Given a user's question and the reason why web search is needed, generate 3 to 10 effective English search queries.
+Focus on what information is missing based on the reason.
+Each query should capture different aspects or phrasings.
+Output one query per line, nothing else.""",
         ),
         (
             "human",
             """Question: {question}
 
-English search query:""",
+Reason for web search: {reason}
+
+Search queries (one per line):""",
         ),
     ]
 )
@@ -23,14 +28,28 @@ English search query:""",
 
 def rewrite_query(state: CRAGState, llm: BaseChatModel) -> CRAGState:
     question = state["question"]
+    reason = state.get("web_search_reason", "")
 
     chain = REWRITER_PROMPT | llm
-    response = chain.invoke({"question": question})
+    response = chain.invoke({"question": question, "reason": reason})
 
-    rewritten_query = strip_think_tags(response.content)
+    raw_queries = strip_think_tags(response.content)
+    queries = [q.strip() for q in raw_queries.strip().split("\n") if q.strip()]
+
+    # 3개 미만이면 원본 질문 추가
+    if len(queries) < 3:
+        queries.append(question)
+
+    # 10개 초과면 자르기
+    queries = queries[:10]
+
+    print(f"[Web Search] Reason: {reason}")
+    print("[Web Search] Queries:")
+    for i, q in enumerate(queries, 1):
+        print(f"  {i}. {q}")
 
     return {
         **state,
-        "search_query": rewritten_query,
+        "web_search_queries": queries,
         "retry_count": state.get("retry_count", 0) + 1,
     }
