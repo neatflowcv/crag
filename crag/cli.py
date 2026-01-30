@@ -17,7 +17,7 @@ def ingest(
     """문서를 벡터스토어에 인제스트"""
     from langchain_core.documents import Document
 
-    from src.vectorstore.store import VectorStore
+    from crag.vectorstore.store import VectorStore
 
     if not docs_dir.exists():
         typer.echo(f"Documents directory not found: {docs_dir}")
@@ -51,8 +51,8 @@ def run(
     """CRAG로 질문에 답변"""
     import httpx
 
-    from src.config.settings import settings
-    from src.graph.builder import build_graph
+    from crag.config.settings import settings
+    from crag.graph.builder import build_graph
 
     def check_ollama() -> bool:
         try:
@@ -81,7 +81,7 @@ def run(
     typer.echo(f"Question: {question}")
     typer.echo("-" * 50)
 
-    from src.vectorstore.store import VectorStore
+    from crag.vectorstore.store import VectorStore
 
     llm = get_llm()
     store = VectorStore()

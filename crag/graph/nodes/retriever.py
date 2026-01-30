@@ -1,5 +1,5 @@
-from src.models.state import CRAGState
-from src.vectorstore.store import VectorStore
+from crag.models.state import CRAGState
+from crag.vectorstore.store import VectorStore
 
 
 def retrieve(state: CRAGState, store: VectorStore) -> CRAGState:

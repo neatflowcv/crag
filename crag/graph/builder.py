@@ -3,15 +3,15 @@ from typing import Literal
 from langchain_core.language_models import BaseChatModel
 from langgraph.graph import END, StateGraph
 
-from src.config.settings import settings
-from src.graph.nodes.generator import generate
-from src.graph.nodes.grader import grade_documents
-from src.graph.nodes.html_fetcher import fetch_html
-from src.graph.nodes.query_rewriter import rewrite_query
-from src.graph.nodes.retriever import retrieve
-from src.graph.nodes.web_searcher import web_search
-from src.models.state import CRAGState
-from src.vectorstore.store import VectorStore
+from crag.config.settings import settings
+from crag.graph.nodes.generator import generate
+from crag.graph.nodes.grader import grade_documents
+from crag.graph.nodes.html_fetcher import fetch_html
+from crag.graph.nodes.query_rewriter import rewrite_query
+from crag.graph.nodes.retriever import retrieve
+from crag.graph.nodes.web_searcher import web_search
+from crag.models.state import CRAGState
+from crag.vectorstore.store import VectorStore
 
 
 def should_continue(state: CRAGState) -> Literal["generate", "rewrite_query"]:

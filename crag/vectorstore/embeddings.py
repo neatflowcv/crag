@@ -4,7 +4,7 @@ import warnings
 import transformers
 from sentence_transformers import SentenceTransformer
 
-from src.config.settings import settings
+from crag.config.settings import settings
 
 transformers.logging.set_verbosity_error()
 logging.getLogger("sentence_transformers").setLevel(logging.ERROR)

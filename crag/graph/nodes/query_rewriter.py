@@ -1,8 +1,8 @@
 from langchain_core.language_models import BaseChatModel
 from langchain_core.prompts import ChatPromptTemplate
 
-from src.models.state import CRAGState
-from src.utils import strip_think_tags
+from crag.models.state import CRAGState
+from crag.utils import strip_think_tags
 
 REWRITER_PROMPT = ChatPromptTemplate.from_messages(
     [

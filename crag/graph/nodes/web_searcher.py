@@ -1,5 +1,5 @@
-from src.models.state import CRAGState
-from src.web.search import search_web
+from crag.models.state import CRAGState
+from crag.web.search import search_web
 
 
 def web_search(state: CRAGState) -> CRAGState:

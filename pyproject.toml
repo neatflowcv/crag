@@ -17,6 +17,16 @@ dependencies = [
     "typer>=0.12.0",
 ]
 
+[project.scripts]
+crag = "crag.cli:app"
+
+[tool.uv]
+package = true
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [dependency-groups]
 dev = [
     "pytest>=8.0.0",

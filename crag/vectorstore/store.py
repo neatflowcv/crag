@@ -1,8 +1,8 @@
 import chromadb
 from langchain_core.documents import Document
 
-from src.config.settings import settings
-from src.vectorstore.embeddings import get_embedding_model
+from crag.config.settings import settings
+from crag.vectorstore.embeddings import get_embedding_model
 
 
 class VectorStore:
