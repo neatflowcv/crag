@@ -1,8 +1,12 @@
+import logging
+
 from langchain_core.language_models import BaseChatModel
 from langchain_core.prompts import ChatPromptTemplate
 
 from crag.models.state import CRAGState
 from crag.utils import strip_think_tags
+
+logger = logging.getLogger(__name__)
 
 TRANSLATOR_PROMPT = ChatPromptTemplate.from_messages(
     [
@@ -30,7 +34,7 @@ def translate_query(state: CRAGState, llm: BaseChatModel) -> CRAGState:
 
     translated_query = strip_think_tags(response.content)
 
-    print(f"[Translate] {question} -> {translated_query}")
+    logger.info("[Translate] %s -> %s", question, translated_query)
 
     return {
         **state,

@@ -1,5 +1,9 @@
+import logging
+
 from crag.models.state import CRAGState
 from crag.web.search import WebSearchStrategy
+
+logger = logging.getLogger(__name__)
 
 
 def web_search(state: CRAGState, strategy: WebSearchStrategy) -> CRAGState:
@@ -18,9 +22,9 @@ def web_search(state: CRAGState, strategy: WebSearchStrategy) -> CRAGState:
                 seen_urls.add(url)
                 all_results.append(result.to_dict())
                 new_count += 1
-        print(f"[Web Search] '{query}' -> {len(results)} results ({new_count} new)")
+        logger.info("[Web Search] '%s' -> %d results (%d new)", query, len(results), new_count)
 
-    print(f"[Web Search] Total: {len(all_results)} unique results")
+    logger.info("[Web Search] Total: %d unique results", len(all_results))
 
     return {
         **state,

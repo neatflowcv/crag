@@ -1,6 +1,12 @@
+import logging
 from pathlib import Path
 
 import typer
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(message)s",
+)
 
 app = typer.Typer(help="CRAG CLI - Corrective RAG 시스템")
 

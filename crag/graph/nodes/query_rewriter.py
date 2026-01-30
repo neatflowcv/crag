@@ -1,8 +1,12 @@
+import logging
+
 from langchain_core.language_models import BaseChatModel
 from langchain_core.prompts import ChatPromptTemplate
 
 from crag.models.state import CRAGState
 from crag.utils import strip_think_tags
+
+logger = logging.getLogger(__name__)
 
 REWRITER_PROMPT = ChatPromptTemplate.from_messages(
     [
@@ -43,10 +47,10 @@ def rewrite_query(state: CRAGState, llm: BaseChatModel) -> CRAGState:
     # 10개 초과면 자르기
     queries = queries[:10]
 
-    print(f"[Web Search] Reason: {reason}")
-    print("[Web Search] Queries:")
+    logger.info("[Web Search] Reason: %s", reason)
+    logger.info("[Web Search] Queries:")
     for i, q in enumerate(queries, 1):
-        print(f"  {i}. {q}")
+        logger.info("  %d. %s", i, q)
 
     return {
         **state,
